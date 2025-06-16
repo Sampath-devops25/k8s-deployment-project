@@ -21,3 +21,35 @@ spec:
         imagePullPolicy: "Always"
         ports:
         - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: swiggy-app
+  labels:
+    app: swiggy-app
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 3000
+  selector:
+    app: swiggy-app
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: eks deployment Application
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/Sampath-devops25/k8s-deployment-project.git
+    targetRevision: HEAD
+    path: .
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
